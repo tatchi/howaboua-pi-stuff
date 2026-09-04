@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             platform_arch: linux-x64
           - os: ubuntu-24.04-arm
             platform_arch: linux-arm64
