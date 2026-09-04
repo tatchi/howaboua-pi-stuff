@@ -18,7 +18,7 @@ on:
       - 'packages/pi-gippity-control/scripts/build-voice-helper.mjs'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             platform_arch: linux-x64
           - os: ubuntu-24.04-arm
             platform_arch: linux-arm64
@@ -71,33 +71,33 @@ jobs:
             packages/pi-codex-conversion/src/tools/exec/bin/${{ matrix.platform_arch }}/
             packages/pi-codex-conversion/src/voice/bin/${{ matrix.platform_arch }}/
 
-  bundle:
-    name: Commit bundled binaries
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          ref: ${{ github.ref }}
-      - uses: actions/download-artifact@v7
-        with:
-          pattern: codex-tool-binaries-*
-          merge-multiple: true
-          path: packages/pi-codex-conversion/src
-      - name: Commit bundled binaries
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          find packages/pi-codex-conversion/src/tools packages/pi-codex-conversion/src/voice/bin -path '*/bin/*' -type f ! -name '*.exe' -exec chmod 755 {} +
-          rm -rf packages/pi-gippity-control/src/voice/bin
-          cp -a packages/pi-codex-conversion/src/voice/bin packages/pi-gippity-control/src/voice/bin
-          git add packages/pi-codex-conversion/src/tools/*/bin
-          git add packages/pi-codex-conversion/src/voice/bin
-          git add packages/pi-gippity-control/src/voice/bin
-          if git diff --cached --quiet; then
-            echo "No bundled binary changes."
-            exit 0
-          fi
-          git commit -m "Bundle Codex tool binaries"
-          git push origin HEAD:${{ github.ref_name }}
+#   bundle:
+#     name: Commit bundled binaries
+#     needs: build
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v6
+#         with:
+#           fetch-depth: 0
+#           ref: ${{ github.ref }}
+#       - uses: actions/download-artifact@v7
+#         with:
+#           pattern: codex-tool-binaries-*
+#           merge-multiple: true
+#           path: packages/pi-codex-conversion/src
+#       - name: Commit bundled binaries
+#         run: |
+#           git config user.name "github-actions[bot]"
+#           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+#           find packages/pi-codex-conversion/src/tools packages/pi-codex-conversion/src/voice/bin -path '*/bin/*' -type f ! -name '*.exe' -exec chmod 755 {} +
+#           rm -rf packages/pi-gippity-control/src/voice/bin
+#           cp -a packages/pi-codex-conversion/src/voice/bin packages/pi-gippity-control/src/voice/bin
+#           git add packages/pi-codex-conversion/src/tools/*/bin
+#           git add packages/pi-codex-conversion/src/voice/bin
+#           git add packages/pi-gippity-control/src/voice/bin
+#           if git diff --cached --quiet; then
+#             echo "No bundled binary changes."
+#             exit 0
+#           fi
+#           git commit -m "Bundle Codex tool binaries"
+#           git push origin HEAD:${{ github.ref_name }}
